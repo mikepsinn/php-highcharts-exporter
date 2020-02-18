@@ -1,0 +1,14 @@
+/bootstrap/compiled.php
+/vendor
+composer.phar
+.env.*.php
+.env.php
+.DS_Store
+Thumbs.db
+.env
+/images/*
+!/images/.gitkeep
+/.idea/
+.phpunit.result.cache
+composer.lock
+/build/
