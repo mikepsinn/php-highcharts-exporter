@@ -1,7 +1,9 @@
 <?php /** @noinspection PhpUnused */
 namespace MikeSinn\HighchartsExporter;
+
 use LogicException;
 use RuntimeException;
+
 class HighchartsExport
 {
     const PNG = "png";
@@ -29,26 +31,30 @@ class HighchartsExport
     /**
      * @param $config
      */
-    public function __construct($config){
+    public function __construct($config)
+    {
         $this->setHighchartConfig($config);
     }
-    public static function execute($cmd){
+    public static function execute($cmd)
+    {
         $packagePath = self::getPackagePath();
-        $cmd = "cd $packagePath && $cmd";
+        $cmd = "cd ".$packagePath." && ".$cmd; // Seems to have problems when putting variables within quotes sometimes
         $output = shell_exec($cmd); // Not sure what output ": not found" means but it seems to work anyway
         return $output;
     }
     /**
      * @return mixed
      */
-    public function getImageType(){
+    public function getImageType()
+    {
         return $this->imageType;
     }
     /**
      * @param mixed $imageType
      * @return HighchartsExport
      */
-    public function setImageType($imageType){
+    public function setImageType($imageType)
+    {
         $this->imageType = $imageType;
         return $this;
     }
@@ -60,7 +66,8 @@ class HighchartsExport
      *     of 1200. So this is a convenient way of increasing the resolution without decreasing the font size and line
      *     widths in the chart. This is ignored if the -width parameter is set.
      */
-    public function setScale($scale){
+    public function setScale($scale)
+    {
         $this->scale = $scale;
         return $this;
     }
@@ -69,15 +76,17 @@ class HighchartsExport
      * @return HighchartsExport
      *  Set the exact pixel width of the exported image or pdf. This overrides the -scale parameter.
      */
-    public function setWidth($width){
+    public function setWidth($width)
+    {
         $this->width = $width;
         return $this;
     }
     /**
      * @return mixed
      */
-    public function getHighchartConfig(){
-        if(!$this->highchartConfig){
+    public function getHighchartConfig()
+    {
+        if (!$this->highchartConfig) {
             throw new LogicException("Please set highchartConfig");
         }
         return $this->highchartConfig;
@@ -86,11 +95,12 @@ class HighchartsExport
      * @param mixed $highchartConfig
      * @return HighchartsExport
      */
-    public function setHighchartConfig($highchartConfig){
-        if(is_string($highchartConfig)){
+    public function setHighchartConfig($highchartConfig)
+    {
+        if (is_string($highchartConfig)) {
             $highchartConfig = json_decode($highchartConfig);
             $error = json_last_error_msg();
-            if($error && $error !== "No error"){
+            if ($error && $error !== "No error") {
                 throw new LogicException($error);
             }
         }
@@ -100,39 +110,47 @@ class HighchartsExport
     /**
      * @return string
      */
-    public function getOutputFilePath(){
+    public function getOutputFilePath()
+    {
         $name = $this->getOutputFileName();
-        if(!$this->outputPath){
+        if (!$this->outputPath) {
             return $this->outputPath = HighchartsExport::getOutputFolder()."/$name";
         }
         return $this->outputPath;
     }
-    public static function getOutputFolder(){
+    public static function getOutputFolder()
+    {
         return HighchartsExport::getPackagePath()."/output";
     }
     /**
      * @param string $outputPath
      */
-    public function setOutputPath($outputPath){
+    public function setOutputPath($outputPath)
+    {
         $this->outputPath = $outputPath;
     }
     /**
      * @param string $name
      * @return HighchartsExport
      */
-    public function setOutputFileName($name){
+    public function setOutputFileName($name)
+    {
         $this->outputFileName = $name;
         return $this;
     }
     /**
      * @return string
      */
-    public function getImageData() {
-        if($this->imageData){return $this->imageData;}
+    public function getImageData()
+    {
+        if ($this->imageData) {
+            return $this->imageData;
+        }
         $this->export();
         return $this->imageData;
     }
-    public function getFilePath(){
+    public function getFilePath()
+    {
         $this->getImageData();
         return $this->getOutputFilePath();
     }
@@ -142,138 +160,110 @@ class HighchartsExport
      * @param string $elementId
      * @return string
      */
-    public function getHtml($alt = "Chart", $title = "Chart", $elementId = "chart") {
+    public function getHtml($alt = "Chart", $title = "Chart", $elementId = "chart")
+    {
         $data = $this->getImageData();
         return self::imageDataToHtml($this->getImageType(), $data, $alt, $title, $elementId);
     }
     /**
      * @return string
      */
-    public function getConstructor(){
+    public function getConstructor()
+    {
         $config = $this->getHighchartConfig();
         $useHighStock = isset($config->useHighStocks) ? $config->useHighStocks : $this->useHighStock;
-        if($useHighStock){
+        if ($useHighStock) {
             $constr = "StockChart";
-        }else{
+        } else {
             $constr = "Chart";
         }
         return $constr;
     }
-    private static function getPackagePath(){
+    private static function getPackagePath()
+    {
         return realpath(__DIR__.'/..');
     }
-    private function writeConfig(){
+    private function writeConfig()
+    {
         $configPath = HighchartsExport::getConfigPath();
         $config = $this->getHighchartConfig();
-        self::writeByFilePath($configPath, self::prettyJsonEncode($config));
+        self::writeByFilePath($configPath, json_encode($config, JSON_PRETTY_PRINT));
     }
     /**
      * @param string $name
      * @return string
      */
-    public static function getConfigPath($name = "config"){
+    public static function getConfigPath($name = "config")
+    {
         return HighchartsExport::getPackagePath()."/configs/$name.json";
     }
     /**
      * @param string $name
      * @return string
      */
-    public static function getConfigContents($name = "config"){
+    public static function getConfigContents($name = "config")
+    {
         return json_decode(file_get_contents(self::getConfigPath($name)));
     }
     /**
      * @param $fileName
      */
-    public static function deleteOutputImageFile($fileName){
+    public static function deleteOutputImageFile($fileName)
+    {
         $filePath = self::getOutputFolder()."/$fileName";
-        try {unlink($filePath);} catch (\Throwable $e){}
+        try {
+            unlink($filePath);
+        } catch (\Throwable $e) {
+        }
     }
     /**
      * @param string $name
      */
-    public static function deleteConfig($name = "config"){
+    public static function deleteConfig($name = "config")
+    {
         $filePath = self::getConfigPath($name);
-        try {unlink($filePath);} catch (\Throwable $e){}
+        try {
+            unlink($filePath);
+        } catch (\Throwable $e) {
+        }
     }
     /**
      * @return string
      */
-    private function getScaleWidthFlags(){
+    private function getScaleWidthFlags()
+    {
         $flags = "";
-        if($this->scale){$flags .= " -scale $this->scale ";}
-        if($this->width){$flags .= " -width $this->width ";}
-        return $flags;
-    }
-    public static function prettyJsonEncode($obj) {
-        $json = json_encode($obj);
-        $result = '';
-        $level = 0;
-        $in_quotes = false;
-        $in_escape = false;
-        $ends_line_level = NULL;
-        $json_length = strlen($json);
-        for($i = 0; $i < $json_length; $i++){
-            $char = $json[$i];
-            $new_line_level = NULL;
-            $post = "";
-            if($ends_line_level !== NULL){
-                $new_line_level = $ends_line_level;
-                $ends_line_level = NULL;
-            }
-            if($in_escape){
-                $in_escape = false;
-            }else if($char === '"'){
-                $in_quotes = !$in_quotes;
-            }else if(!$in_quotes){
-                switch($char){
-                    case '}':
-                    case ']':
-                        $level--;
-                        $ends_line_level = NULL;
-                        $new_line_level = $level;
-                        break;
-                    case '{':
-                        /** @noinspection PhpMissingBreakStatementInspection */ case '[':
-                    $level++;
-                    case ',':
-                        $ends_line_level = $level;
-                        break;
-                    case ':':
-                        $post = " ";
-                        break;
-                    case " ":
-                    case "\t":
-                    case "\n":
-                    case "\r":
-                        $char = "";
-                        $ends_line_level = $new_line_level;
-                        $new_line_level = NULL;
-                        break;
-                }
-            }else if($char === '\\'){
-                $in_escape = true;
-            }
-            if($new_line_level !== NULL){
-                $result .= "\n".str_repeat("\t", $new_line_level);
-            }
-            $result .= $char.$post;
+        if ($this->scale) {
+            $flags .= " -scale $this->scale ";
         }
-        return $result;
+        if ($this->width) {
+            $flags .= " -width $this->width ";
+        }
+        return $flags;
     }
     /**
      * @param string $filePath
      * @param $content
      * @return string
      */
-    public function writeByFilePath($filePath, $content) {
-        if(!is_string($content)){$content = json_encode($content);}
-        if(trim($content) === ""){throw new LogicException("$filePath is empty!");}
+    public function writeByFilePath($filePath, $content)
+    {
+        if (!is_string($content)) {
+            $content = json_encode($content);
+        }
+        if (trim($content) === "") {
+            throw new LogicException("$filePath is empty!");
+        }
         $directory = dirname($filePath);
         self::createDirectoryIfNecessary($directory);
-        if(self::existsAndHasNotChanged($filePath, $content)){return false;}
+        if (self::existsAndHasNotChanged($filePath, $content)) {
+            return false;
+        }
         chmod($directory, 0777);
-        if(!file_exists($filePath)){
-            if(!touch($filePath)){throw new LogicException("No permission for $filePath");}
+        if (!file_exists($filePath)) {
+            if (!touch($filePath)) {
+                throw new LogicException("No permission for $filePath");
+            }
             chmod($filePath, 0777);
         }
         $fp = fopen($filePath, 'wb');
@@ -284,8 +274,9 @@ class HighchartsExport
     /**
      * @param string $directory
      */
-    public static function createDirectoryIfNecessary($directory){
-        if(!file_exists($directory) && !mkdir($directory, 0777, true) && !is_dir($directory)){
+    public static function createDirectoryIfNecessary($directory)
+    {
+        if (!file_exists($directory) && !mkdir($directory, 0777, true) && !is_dir($directory)) {
             throw new RuntimeException(sprintf('Directory "%s" was not created', $directory));
         }
     }
@@ -294,14 +285,15 @@ class HighchartsExport
      * @param $content
      * @return bool
      */
-    protected static function existsAndHasNotChanged($filePath, $content){
+    protected static function existsAndHasNotChanged($filePath, $content)
+    {
         $existsAndHasNotChanged = false;
         try {
             $existing = file_get_contents($filePath);
-        } catch (\Throwable $e){
+        } catch (\Throwable $e) {
             return false;
         }
-        if($existing === $content){
+        if ($existing === $content) {
             $existsAndHasNotChanged = true;
         }
         return $existsAndHasNotChanged;
@@ -309,24 +301,27 @@ class HighchartsExport
     /**
      * @return string
      */
-    private function getOutputFileName(){
+    private function getOutputFileName()
+    {
         $name = $this->outputFileName;
-        if(!$name){
+        if (!$name) {
             $name = "chart.".$this->getImageType();
         }
         return $name;
     }
-    private function export(){
+    private function export()
+    {
         $constr = $this->getConstructor();
-        $packagePath = HighchartsExport::getPackagePath();
         $configPath = HighchartsExport::getConfigPath();
         $outputPath = $this->getOutputFilePath();
         $flags = $this->getScaleWidthFlags();
         $this->writeConfig();
         self::deleteOutputImageFile($this->getOutputFileName());
-        $this->exportCommand = "./phantomjs highcharts-convert.js -infile $configPath -constr $constr -outfile $outputPath $flags";
+        // Seems to have problems when putting variables within quotes sometimes
+        $this->exportCommand = "./phantomjs highcharts-convert.js -infile ".$configPath." -constr ".$constr.
+            " -outfile ".$outputPath." ".$flags;
         $this->commandOutput = $output = self::execute($this->exportCommand);
-        if(strpos($output, "Error") !== false){
+        if (strpos($output, "Error") !== false) {
             throw new RuntimeException($output);
         }
         $this->imageData = file_get_contents($outputPath);
@@ -339,7 +334,8 @@ class HighchartsExport
      * @param string $elementId
      * @return string
      */
-    public static function imageDataToHtml($type, $data, $alt, $title, $elementId){
+    public static function imageDataToHtml($type, $data, $alt, $title, $elementId)
+    {
         if ($type === self::SVG) {
             $imageHtml = $data;
         } else {
@@ -354,8 +350,9 @@ class HighchartsExport
                     alt="' . $alt . '"
                     title="' . $title . '"/>';
         }
-        if(stripos($imageHtml, "position: absolute") !== false){
-            throw new \LogicException("Do not use position: absolute because all the images will pile on top of each other!");
+        if (stripos($imageHtml, "position: absolute") !== false) {
+            throw new \LogicException("Do not use position: absolute because all the images will pile on top ".
+                "of each other!");
         }
         return $imageHtml;
     }
