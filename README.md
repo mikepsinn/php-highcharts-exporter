@@ -16,12 +16,15 @@ Via Composer
 $ composer require mikepsinn/php-highcharts-exporter
 ```
 
-Add the following post-install-cmd to your `composer.json` file so that phantomjs is executable
+Add the following post-install-cmd and post-update-cmd to your `composer.json` file so that phantomjs is executable
 
 ```
   "scripts": {
     "post-install-cmd": [
-      "chmod +x vendor/mikepsinn/php-highcharts-exporter/phantomjs"
+      "set -x && sudo chmod +x vendor/mikepsinn/php-highcharts-exporter/phantomjs"
+    ],
+    "post-update-cmd": [
+      "set -x && sudo chmod +x vendor/mikepsinn/php-highcharts-exporter/phantomjs"
     ]
   }
 ```
