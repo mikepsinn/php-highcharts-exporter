@@ -35,4 +35,14 @@ class HighChartExportTest extends TestCase
         $path = $e->getFilePath();
         $this->assertStringContainsString($name, $path);
     }
+    public function testThrowsExceptionIfPhantomJsNotExecutable(){
+        $name = "test-chart.png";
+        $path = HighchartsExport::getOutputFolder()."/".$name;
+        HighchartsExport::deleteOutputImageFile($name);
+        $this->assertFileNotExists($path);
+        HighchartsExport::execute("sudo chmod -x phantomjs");
+        $e = new HighchartsExport('{"series":[{"data":[29.9,71.5,106.4]}]}');
+        $data = $e->setOutputFileName($name)->getImageData();
+        $this->assertFileNotExists($path);
+    }
 }

@@ -27,7 +27,10 @@
   "scripts": {
     "test": "phpunit",
     "check-style": "phpcs src tests",
-    "fix-style": "phpcbf src tests"
+    "fix-style": "phpcbf src tests",
+    "post-install-cmd": [
+      "chmod +x vendor/mikepsinn/php-highcharts-exporter/phantomjs"
+    ]
   },
   "authors": [
     {
