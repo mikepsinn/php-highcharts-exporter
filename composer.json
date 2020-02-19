@@ -8,7 +8,8 @@
     "highcharts"
   ],
   "require": {
-    "ext-json": "*"
+    "ext-json": "*",
+    "operating-system/permission": "^1.1"
   },
   "require-dev": {
     "phpunit/phpunit": "^8",

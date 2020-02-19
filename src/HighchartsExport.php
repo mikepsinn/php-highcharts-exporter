@@ -35,6 +35,12 @@ class HighchartsExport
     {
         $this->setHighchartConfig($config);
     }
+
+    public static function getPhantomJSPath()
+    {
+        return self::getPackagePath()."/phantomjs";
+    }
+
     public static function execute($cmd)
     {
         $packagePath = self::getPackagePath();

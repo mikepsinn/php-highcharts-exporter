@@ -3,10 +3,19 @@
 namespace MikeSinn\HighchartsExporter\Test;
 
 use MikeSinn\HighchartsExporter\HighchartsExport;
+use OperatingSystem\Permission\Permission;
 use PHPUnit\Framework\TestCase;
 
 class HighChartExportTest extends TestCase
 {
+    public function testPhantomJsPermissions(){
+        $path = HighchartsExport::getPhantomJSPath();
+        $this->assertFileIsReadable($path);
+        $mode = stat($path)['mode'];
+        $permission = new Permission($mode);
+        $this->assertTrue($permission->canUserExecute(), "Current user cannot execute PhantomJS");
+        $this->assertTrue($permission->canOthersExecute(), "Other users cannot execute PhantomJS");
+    }
     public function testGeneratePng()
     {
         $name = "test-chart.png";
