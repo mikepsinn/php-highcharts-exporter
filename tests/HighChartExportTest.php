@@ -1,11 +1,14 @@
 <?php
 /** @noinspection PhpParamsInspection */
 namespace MikeSinn\HighchartsExporter\Test;
+
 use MikeSinn\HighchartsExporter\HighchartsExport;
 use PHPUnit\Framework\TestCase;
+
 class HighChartExportTest extends TestCase
 {
-    public function testGeneratePng(){
+    public function testGeneratePng()
+    {
         $name = "test-chart.png";
         $path = HighchartsExport::getOutputFolder()."/".$name;
         HighchartsExport::deleteOutputImageFile($name);
@@ -19,7 +22,8 @@ class HighChartExportTest extends TestCase
         $this->assertStringContainsString("PNG", $data);
         $this->assertFileExists($path);
     }
-    public function testGeneratePngFromString(){
+    public function testGeneratePngFromString()
+    {
         $name = "test-chart.png";
         $path = HighchartsExport::getOutputFolder()."/".$name;
         HighchartsExport::deleteOutputImageFile($name);
@@ -35,7 +39,8 @@ class HighChartExportTest extends TestCase
         $path = $e->getFilePath();
         $this->assertStringContainsString($name, $path);
     }
-    public function testThrowsExceptionIfPhantomJsNotExecutable(){
+    public function testThrowsExceptionIfPhantomJsNotExecutable()
+    {
         $name = "test-chart.png";
         $path = HighchartsExport::getOutputFolder()."/".$name;
         HighchartsExport::deleteOutputImageFile($name);
