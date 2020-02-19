@@ -19,6 +19,7 @@ matrix:
 
 before_script:
   - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction --prefer-dist
+  - set -x && sudo chmod +x vendor/mikepsinn/php-highcharts-exporter/phantomjs
 
 script:
   - vendor/bin/phpcs --standard=psr2 src/
