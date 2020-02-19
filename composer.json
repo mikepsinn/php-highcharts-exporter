@@ -29,10 +29,10 @@
     "check-style": "phpcs src tests",
     "fix-style": "phpcbf src tests",
     "post-install-cmd": [
-      "set -x && sudo chmod +x vendor/mikepsinn/php-highcharts-exporter/phantomjs"
+      "set -x && sudo chmod +x phantomjs"
     ],
     "post-update-cmd": [
-      "set -x && sudo chmod +x vendor/mikepsinn/php-highcharts-exporter/phantomjs"
+      "set -x && sudo chmod +x phantomjs"
     ]
   },
   "authors": [
