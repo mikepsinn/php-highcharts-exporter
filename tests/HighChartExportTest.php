@@ -56,7 +56,12 @@ class HighChartExportTest extends TestCase
         $this->assertFileNotExists($path);
         HighchartsExport::execute("sudo chmod -x phantomjs");
         $e = new HighchartsExport('{"series":[{"data":[29.9,71.5,106.4]}]}');
-        $data = $e->setOutputFileName($name)->getImageData();
-        $this->assertFileNotExists($path);
+        try {
+            $data = $e->setOutputFileName($name)
+                ->getImageData();
+            $this->assertTrue(false, "Should have thrown an exception");
+        } catch (\Throwable $e){
+            $this->assertTrue(true);
+        }
     }
 }
