@@ -32,6 +32,12 @@ class HighchartsExport
     public function __construct($config){
         $this->setHighchartConfig($config);
     }
+    public static function execute($cmd){
+        $packagePath = self::getPackagePath();
+        $cmd = "cd $packagePath && $cmd";
+        $output = shell_exec($cmd); // Not sure what output ": not found" means but it seems to work anyway
+        return $output;
+    }
     /**
      * @return mixed
      */
@@ -317,11 +323,9 @@ class HighchartsExport
         $outputPath = $this->getOutputFilePath();
         $flags = $this->getScaleWidthFlags();
         $this->writeConfig();
-        $this->exportCommand = "cd $packagePath &&
-            ./phantomjs highcharts-convert.js -infile $configPath -constr $constr -outfile $outputPath $flags";
-        $this->commandOutput =
-        $output =
-            shell_exec($this->exportCommand); // Not sure what output ": not found" means but it seems to work anyway
+        self::deleteOutputImageFile($this->getOutputFileName());
+        $this->exportCommand = "./phantomjs highcharts-convert.js -infile $configPath -constr $constr -outfile $outputPath $flags";
+        $this->commandOutput = $output = self::execute($this->exportCommand);
         if(strpos($output, "Error") !== false){
             throw new RuntimeException($output);
         }
