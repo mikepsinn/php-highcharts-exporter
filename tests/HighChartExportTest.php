@@ -8,7 +8,8 @@ use PHPUnit\Framework\TestCase;
 
 class HighChartExportTest extends TestCase
 {
-    public function testPhantomJsPermissions(){
+    public function testPhantomJsPermissions()
+    {
         $path = HighchartsExport::getPhantomJSPath();
         $this->assertFileIsReadable($path);
         $mode = stat($path)['mode'];
@@ -60,7 +61,7 @@ class HighChartExportTest extends TestCase
             $data = $e->setOutputFileName($name)
                 ->getImageData();
             $this->assertTrue(false, "Should have thrown an exception");
-        } catch (\Throwable $e){
+        } catch (\Throwable $e) {
             $this->assertTrue(true);
         }
     }

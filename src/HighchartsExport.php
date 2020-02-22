@@ -2,6 +2,7 @@
 namespace MikeSinn\HighchartsExporter;
 
 use LogicException;
+use OperatingSystem\Permission\Permission;
 use RuntimeException;
 
 class HighchartsExport
@@ -45,8 +46,28 @@ class HighchartsExport
     {
         $packagePath = self::getPackagePath();
         $cmd = "cd ".$packagePath." && ".$cmd; // Seems to have problems when putting variables within quotes sometimes
-        $output = shell_exec($cmd); // Not sure what output ": not found" means but it seems to work anyway
-        return $output;
+        try {
+            $output = shell_exec($cmd); // Not sure what output ": not found" means but it seems to work anyway
+            return $output;
+        } catch (\Throwable $e) {
+            $path = HighchartsExport::getPhantomJSPath();
+            $permission = new Permission(stat($path)['mode']);
+            if (!$permission->canUserExecute()) {
+                throw new RuntimeException("Current user cannot execute PhantomJS at $path");
+            }
+            if (!$permission->canOthersExecute()) {
+                throw new RuntimeException("Other users cannot execute PhantomJS at $path");
+            }
+            $configPath = HighchartsExport::getConfigPath();
+            $permission = new Permission(stat($configPath)['mode']);
+            if (!$permission->canUserWrite()) {
+                throw new RuntimeException("Current user cannot write config at $configPath");
+            }
+            if (!$permission->canOthersWrite()) {
+                throw new RuntimeException("Other users cannot write config at $configPath");
+            }
+            throw new RuntimeException("Unable to execute $cmd because ".$e->getMessage());
+        }
     }
     /**
      * @return mixed
