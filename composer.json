@@ -29,7 +29,7 @@
     "check-style": "phpcs src tests",
     "fix-style": "phpcbf src tests",
     "post-install-cmd": [
-      "chmod +x vendor/mikepsinn/php-highcharts-exporter/phantomjs"
+      "chmod +x phantomjs"
     ]
   },
   "authors": [
